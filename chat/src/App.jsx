@@ -4,11 +4,12 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-// import { useAuth } from "./hooks/useAuth";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
+import { useAuth } from "./hooks/useAuth";
 import "./App.css";
-import { useAuth } from "hooks/useAuth";
+import { OnlineUsers } from "./components/Onlineuser";
+import { ChatRoom } from "./components/ui/chat/ChatRoom";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -16,38 +17,8 @@ const PrivateRoute = ({ children }) => {
 };
 
 const PublicRoute = ({ children }) => {
-  const { user } = useAuth;
+  const { user } = useAuth();
   return !user ? children : <Navigate to="/onlineusers" />;
-};
-
-const Dashboard = () => {
-  const { user, logout } = useAuth();
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Welcome, {user?.username}!</h1>
-          <button
-            onClick={logout}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Logout
-          </button>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
-          <div className="space-y-2">
-            <p>
-              <span className="font-medium">Email:</span> {user?.email}
-            </p>
-            <p>
-              <span className="font-medium">Role:</span> {user?.role}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 function App() {
@@ -74,7 +45,15 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Online />
+              <OnlineUsers />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat/:receiverId"
+          element={
+            <PrivateRoute>
+              <ChatRoom />
             </PrivateRoute>
           }
         />

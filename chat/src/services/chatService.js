@@ -15,4 +15,21 @@ export const chatService = {
       throw error.response?.data?.message || "Failed to fetch available users";
     }
   },
+
+  createOneOnOneChat: async (accessToken, receiverId) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/chats/c/${receiverId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to create chat";
+    }
+  },
 };
