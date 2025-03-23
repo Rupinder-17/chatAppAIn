@@ -9,7 +9,7 @@ import { RegisterForm } from "./components/RegisterForm";
 import { useAuth } from "./hooks/useAuth";
 import "./App.css";
 import { OnlineUsers } from "./components/Onlineuser";
-import { ChatRoom } from "./components/ui/chat/ChatRoom";
+import { ChatRoom } from "./components/ChatRoom";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();

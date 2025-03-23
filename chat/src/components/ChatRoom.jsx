@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { chatService } from "../services/chatService";
 
 export const ChatRoom = ({ receiverId }) => {
   const { accessToken } = useAuth();
