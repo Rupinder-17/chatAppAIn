@@ -24,8 +24,8 @@ export const LoginForm = () => {
       await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch (err) {
-        console.log(err);
-        
+      console.log(err);
+
       // Error is handled by useAuth hook
     }
   };
@@ -39,7 +39,10 @@ export const LoginForm = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <a
+              href="/register"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
               Sign up
             </a>
           </p>
