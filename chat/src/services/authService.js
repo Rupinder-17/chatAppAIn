@@ -1,34 +1,7 @@
-interface RegisterData {
-  email: string;
-  password: string;
-  username: string;
-  fullName: string;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-interface AuthResponse {
-  data: {
-    user: {
-      _id: string;
-      username: string;
-      email: string;
-      role: string;
-    };
-    accessToken: string;
-  };
-  statusCode: number;
-  message: string;
-  success: boolean;
-}
-
 class AuthService {
-  private baseUrl = "https://api.freeapi.app/api/v1/users";
+  baseUrl = "https://api.freeapi.app/api/v1/users";
 
-  async register(userData: RegisterData): Promise<AuthResponse> {
+  async register(userData) {
     const response = await fetch(`${this.baseUrl}/register`, {
       method: "POST",
       headers: {
@@ -50,7 +23,7 @@ class AuthService {
     return response.json();
   }
 
-  async login(credentials: LoginData): Promise<AuthResponse> {
+  async login(credentials) {
     const response = await fetch(`${this.baseUrl}/login`, {
       method: "POST",
       headers: {
