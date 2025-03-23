@@ -23,7 +23,8 @@ export const RegisterForm = () => {
     e.preventDefault();
     try {
       await register(formData);
-      navigate("/dashboard");
+      // Redirect to login page after successful registration
+      navigate("/login");
     } catch (err) {
       // Error is handled by useAuth hook
       console.log(err);

@@ -48,8 +48,9 @@ export const useAuth = () => {
       setLoading(true);
       setError(null);
       const response = await authService.register(userData);
-      setUser(response.data.user);
-      setAccessToken(response.data.accessToken);
+      // Don't set user and token after registration
+      // User needs to login separately
+      return response.data;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
       throw err;
