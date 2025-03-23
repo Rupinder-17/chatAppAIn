@@ -7,8 +7,6 @@ export const useOnlineUsers = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { accessToken } = useAuth();
-  console.log("onlineusers", onlineUsers);
-  
 
   const fetchOnlineUsers = async () => {
     if (!accessToken) return;

@@ -24,9 +24,9 @@ export const LoginForm = () => {
       await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch (err) {
-      console.log(err);
-
       // Error is handled by useAuth hook
+      console.log(err);
+      
     }
   };
 

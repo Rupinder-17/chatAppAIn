@@ -4,10 +4,11 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
+// import { useAuth } from "./hooks/useAuth";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
 import "./App.css";
+import { useAuth } from "hooks/useAuth";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -15,8 +16,8 @@ const PrivateRoute = ({ children }) => {
 };
 
 const PublicRoute = ({ children }) => {
-  const { user } = useAuth();
-  return !user ? children : <Navigate to="/dashboard" />;
+  const { user } = useAuth;
+  return !user ? children : <Navigate to="/onlineusers" />;
 };
 
 const Dashboard = () => {
@@ -73,7 +74,7 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <Online />
             </PrivateRoute>
           }
         />

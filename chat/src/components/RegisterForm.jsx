@@ -28,6 +28,7 @@ export const RegisterForm = () => {
     } catch (err) {
       // Error is handled by useAuth hook
       console.log(err);
+      
     }
   };
 
