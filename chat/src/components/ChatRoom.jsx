@@ -6,17 +6,16 @@ import { useParams } from "react-router";
 
 export const ChatRoom = () => {
   // console.log("receiverId",receiverId);
-  
+
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
-  const {receiverId} = useParams();
-  console.log("useParams",receiverId);
-  console.log("chatId",chatId);
-  
+  const { receiverId } = useParams();
+  console.log("useParams", receiverId);
+  console.log("chatIdsss", chatId);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -34,8 +33,8 @@ export const ChatRoom = () => {
           accessToken,
           response.data._id
         );
-        console.log("messagesResponse",messagesResponse);
-        
+        console.log("messagesResponse", messagesResponse);
+
         setMessages(messagesResponse.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
@@ -46,9 +45,35 @@ export const ChatRoom = () => {
 
     initializeChat();
   }, [accessToken, receiverId]);
+
   const [messageInput, setMessageInput] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+useEffect(()=>{
+  // Set up periodic message fetching
+  let messageInterval;
+  console.log("chatIdmmmm", chatId);
 
+  if (chatId) {
+    messageInterval = setInterval(async () => {
+      try {
+        const messagesResponse = await chatService.getAllMessages(
+          accessToken,
+          chatId
+        );
+        setMessages(messagesResponse.data);
+      } catch (err) {
+        console.error("Failed to fetch messages:", err);
+      }
+    }, 2000); // Fetch every 10 seconds
+  }
+
+  // Cleanup interval on unmount or when chatId changes
+  return () => {
+    if (messageInterval) {
+      clearInterval(messageInterval);
+    }
+  };
+},[accessToken, chatId])
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !chatId || sendingMessage) return;
 
@@ -171,7 +196,7 @@ export const ChatRoom = () => {
               </div>
             )}
           </div>
-          
+
           <div className="flex gap-2">
             <input
               type="text"
@@ -184,7 +209,7 @@ export const ChatRoom = () => {
             />
             <button
               onClick={handleSendMessage}
-              disabled={sendingMessage || !messageInput.trim()}
+              disabled={sendingMessage}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendingMessage ? "Sending..." : "Send"}
