@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 
+
 export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();

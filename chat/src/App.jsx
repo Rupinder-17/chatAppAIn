@@ -18,6 +18,8 @@ const PrivateRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
+  console.log("user",user);
+  
   return !user ? children : <Navigate to="/onlineusers" />;
 };
 
@@ -42,7 +44,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard"
+          path="/onlineusers"
           element={
             <PrivateRoute>
               <OnlineUsers />
