@@ -46,6 +46,27 @@ export const ChatRoom = () => {
 
     initializeChat();
   }, [accessToken, receiverId]);
+  const [messageInput, setMessageInput] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !chatId || sendingMessage) return;
+
+    try {
+      setSendingMessage(true);
+      await chatService.sendMessage(accessToken, chatId, messageInput);
+      setMessageInput("");
+      const messagesResponse = await chatService.getAllMessages(
+        accessToken,
+        chatId
+      );
+      setMessages(messagesResponse.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -150,15 +171,23 @@ export const ChatRoom = () => {
               </div>
             )}
           </div>
-          {/* Message input will be implemented here */}
+          
           <div className="flex gap-2">
             <input
               type="text"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
               placeholder="Type your message..."
               className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              disabled={sendingMessage}
             />
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-              Send
+            <button
+              onClick={handleSendMessage}
+              disabled={sendingMessage || !messageInput.trim()}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sendingMessage ? "Sending..." : "Send"}
             </button>
           </div>
         </div>
