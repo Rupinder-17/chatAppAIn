@@ -1,95 +1,18 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { chatService } from "../services/chatService";
 import { useParams } from "react-router";
+import { useChat } from "../hooks/useChat";
 
 export const ChatRoom = () => {
-  // console.log("receiverId",receiverId);
-
-  const { accessToken } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [chatId, setChatId] = useState(null);
   const { receiverId } = useParams();
-  console.log("useParams", receiverId);
-  console.log("chatIdsss", chatId);
-
-  useEffect(() => {
-    const initializeChat = async () => {
-      if (!accessToken || !receiverId) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await chatService.createOneOnOneChat(
-          accessToken,
-          receiverId
-        );
-        setChatId(response.data._id);
-        const messagesResponse = await chatService.getAllMessages(
-          accessToken,
-          response.data._id
-        );
-        console.log("messagesResponse", messagesResponse);
-
-        setMessages(messagesResponse.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create chat");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeChat();
-  }, [accessToken, receiverId]);
-
+  const { loading, error, messages, sendingMessage, sendMessage } =
+    useChat(receiverId);
   const [messageInput, setMessageInput] = useState("");
-  const [sendingMessage, setSendingMessage] = useState(false);
-useEffect(()=>{
-  // Set up periodic message fetching
-  let messageInterval;
-  console.log("chatIdmmmm", chatId);
 
-  if (chatId) {
-    messageInterval = setInterval(async () => {
-      try {
-        const messagesResponse = await chatService.getAllMessages(
-          accessToken,
-          chatId
-        );
-        setMessages(messagesResponse.data);
-      } catch (err) {
-        console.error("Failed to fetch messages:", err);
-      }
-    }, 2000); // Fetch every 10 seconds
-  }
-
-  // Cleanup interval on unmount or when chatId changes
-  return () => {
-    if (messageInterval) {
-      clearInterval(messageInterval);
-    }
-  };
-},[accessToken, chatId])
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !chatId || sendingMessage) return;
-
-    try {
-      setSendingMessage(true);
-      await chatService.sendMessage(accessToken, chatId, messageInput);
+    if (await sendMessage(messageInput)) {
       setMessageInput("");
-      const messagesResponse = await chatService.getAllMessages(
-        accessToken,
-        chatId
-      );
-      setMessages(messagesResponse.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send message");
-    } finally {
-      setSendingMessage(false);
     }
   };
 
