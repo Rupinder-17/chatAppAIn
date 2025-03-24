@@ -7,6 +7,8 @@ export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();
   const [searchQuery, setSearchQuery] = useState("");
+  console.log("search",searchQuery);
+  
 
   const filteredUsers = onlineUsers.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -215,7 +217,7 @@ export const OnlineUsers = () => {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600  rounded-lg hover:bg-indigo-100 transition-colors"
                 >
                   <svg
                     className="w-4 h-4 mr-1.5"

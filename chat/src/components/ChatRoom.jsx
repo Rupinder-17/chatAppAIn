@@ -181,7 +181,7 @@ useEffect(()=>{
                   >
                     <div
                       className={`max-w-[70%] rounded-lg p-3 ${
-                        message.sender === receiverId
+                        message.sender !== receiverId
                           ? "bg-gray-200 text-gray-900"
                           : "bg-indigo-600 text-white"
                       }`}

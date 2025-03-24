@@ -11,6 +11,8 @@ export const useAuth = () => {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  console.log("user", user);
+  
 
   useEffect(() => {
     if (user) {

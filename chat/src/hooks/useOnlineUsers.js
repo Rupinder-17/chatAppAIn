@@ -15,6 +15,8 @@ export const useOnlineUsers = () => {
       setLoading(true);
       setError(null);
       const response = await chatService.getAvailableUsers(accessToken);
+      console.log("response", response);
+
       setOnlineUsers(response.data);
     } catch (err) {
       setError(
