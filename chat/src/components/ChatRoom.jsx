@@ -2,12 +2,21 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { chatService } from "../services/chatService";
+import { useParams } from "react-router";
 
-export const ChatRoom = ({ receiverId }) => {
+export const ChatRoom = () => {
+  // console.log("receiverId",receiverId);
+  
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [chatId, setChatId] = useState(null);
+  const {receiverId} = useParams();
+  console.log("useParams",receiverId);
+  console.log("chatId",chatId);
+  
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -20,8 +29,14 @@ export const ChatRoom = ({ receiverId }) => {
           accessToken,
           receiverId
         );
-        // Handle successful chat creation
-        console.log("Chat created:", response.data);
+        setChatId(response.data._id);
+        const messagesResponse = await chatService.getAllMessages(
+          accessToken,
+          response.data._id
+        );
+        console.log("messagesResponse",messagesResponse);
+        
+        setMessages(messagesResponse.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
       } finally {
@@ -102,11 +117,38 @@ export const ChatRoom = ({ receiverId }) => {
               </svg>
             </button>
           </div>
-          {/* Chat messages will be implemented here */}
-          <div className="h-96 bg-gray-50 rounded-lg p-4 mb-4">
-            <div className="flex items-center justify-center h-full text-gray-500">
-              No messages yet
-            </div>
+          <div className="h-96 bg-gray-50 rounded-lg p-4 mb-4 overflow-y-auto">
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No messages yet
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message._id}
+                    className={`flex ${
+                      message.sender === receiverId
+                        ? "justify-start"
+                        : "justify-end"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[70%] rounded-lg p-3 ${
+                        message.sender === receiverId
+                          ? "bg-gray-200 text-gray-900"
+                          : "bg-indigo-600 text-white"
+                      }`}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                      <span className="text-xs opacity-70">
+                        {new Date(message.createdAt).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           {/* Message input will be implemented here */}
           <div className="flex gap-2">

@@ -18,6 +18,19 @@ export const chatService = {
     }
   },
 
+  getAllMessages: async (accessToken, chatId) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/messages/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to fetch messages";
+    }
+  },
+
   createOneOnOneChat: async (accessToken, receiverId) => {
     try {
       const response = await axios.post(
@@ -44,7 +57,7 @@ export const chatService = {
       const formData = new FormData();
       formData.append("content", message);
 
-      attachments.forEach((file, ) => {
+      attachments.forEach((file) => {
         formData.append(`attachments`, file);
       });
 
