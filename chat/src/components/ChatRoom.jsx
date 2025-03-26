@@ -97,14 +97,14 @@ export const ChatRoom = () => {
                   <div
                     key={message._id}
                     className={`flex ${
-                      message.sender === receiverId
+                      message.sender._id === receiverId
                         ? "justify-start"
                         : "justify-end"
                     }`}
                   >
                     <div
                       className={`max-w-[70%] rounded-lg p-3 ${
-                        message.sender !== receiverId
+                        message.sender._id === receiverId
                           ? "bg-gray-200 text-gray-900"
                           : "bg-indigo-600 text-white"
                       }`}

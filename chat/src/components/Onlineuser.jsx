@@ -2,13 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 
-
 export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();
   const [searchQuery, setSearchQuery] = useState("");
-  console.log("search",searchQuery);
-  
+  console.log("search", searchQuery);
 
   const filteredUsers = onlineUsers.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -101,6 +99,7 @@ export const OnlineUsers = () => {
                 className="p-2 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Refresh users"
               >
+                {/* <Angry /> */}
                 <svg
                   className="w-5 h-5"
                   fill="none"

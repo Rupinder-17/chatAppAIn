@@ -59,6 +59,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="*" element={<div><h1>this page is not availble</h1></div>}/>
         <Route path="/" element={<Navigate to="/register" />} />
       </Routes>
     </Router>

@@ -24,7 +24,6 @@ export const useChat = (receiverId) => {
       const messagesResponse = await chatService.getAllMessages(
         accessToken,
         response.data._id
-        // chatId
       );
       setMessages(messagesResponse.data);
     } catch (err) {
