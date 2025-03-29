@@ -1,17 +1,36 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { useAuth } from "../hooks/useAuth";
+import { useSearchParams } from "react-router-dom"; // Add this import at the top
 
 export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();
   const { logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log("pram", params);
+
+  useEffect(() => {
+    const query = searchParams.get("q") || "";
+    setSearchQuery(query);
+  }, [searchParams]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (query) {
+      setSearchParams({ q: query });
+    } else {
+      setSearchParams({});
+    }
   };
 
   const filteredUsers = onlineUsers.filter((user) =>
@@ -82,7 +101,7 @@ export const OnlineUsers = () => {
                   type="text"
                   placeholder="Search users..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 />
                 <svg
@@ -190,7 +209,7 @@ export const OnlineUsers = () => {
                   <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 transform translate-y-full group-hover:translate-y-0 transition-transform duration-200">
                     <button
                       onClick={() => {
-                        navigate(`/chat/${user._id}`);
+                        navigate(`/chat/${user._id}/${user.username}?email=${user.email}`);
                       }}
                       className="w-full text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"
                     >

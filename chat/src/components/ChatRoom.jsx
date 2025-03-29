@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { useChat } from "../hooks/useChat";
 
 export const ChatRoom = () => {
   const navigate = useNavigate();
-  const { receiverId } = useParams();
+  const prams  = useParams();
+  console.log("parms", prams);
+  const receiverId = prams.receiverId;
+  const [searchParams, setSearchParams]= useSearchParams()
+  console.log("searchParams", searchParams.get("email"));
+  setSearchParams({role:"this is my email"})
+  
+  
+
   const { loading, error, messages, sendingMessage, sendMessage } =
     useChat(receiverId);
   const [messageInput, setMessageInput] = useState("");

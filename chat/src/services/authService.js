@@ -1,43 +1,57 @@
+import api from "./api";
+
 class AuthService {
   baseUrl = "https://api.freeapi.app/api/v1/users";
 
   async register(userData) {
-    const response = await fetch(`${this.baseUrl}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const response = await api.post("/users/register", {
         email: userData.email,
         password: userData.password,
         username: userData.username,
         role: "USER",
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Registration failed");
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Registration failed";
     }
-
-    return response.json();
   }
 
   async login(credentials) {
-    const response = await fetch(`${this.baseUrl}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Login failed");
+    try {
+      const response = await api.post("/users/login", credentials);
+      const { accessToken, refreshToken } = response.data.data;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Login failed";
     }
+  }
 
-    return response.json();
+  async refreshToken() {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+
+      const response = await api.post("/users/refresh-token", { refreshToken });
+      const { accessToken: newAccessToken } = response.data.data;
+      localStorage.setItem("accessToken", newAccessToken);
+      return newAccessToken;
+    } catch (error) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      throw error.response?.data?.message || "Token refresh failed";
+    }
+  }
+
+  logout() {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
   }
 }
 

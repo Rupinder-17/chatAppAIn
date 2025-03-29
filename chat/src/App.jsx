@@ -52,7 +52,7 @@ function App() {
           }
         />
         <Route
-          path="/chat/:receiverId"
+          path="/chat/:receiverId/:username"
           element={
             <PrivateRoute>
               <ChatRoom />

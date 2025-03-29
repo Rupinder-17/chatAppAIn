@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "./api";
 
 const BASE_URL = "https://api.freeapi.app/api/v1/chat-app";
 
@@ -7,11 +7,7 @@ const MAX_ATTACHMENTS = 5;
 export const chatService = {
   getAvailableUsers: async (accessToken) => {
     try {
-      const response = await axios.get(`${BASE_URL}/chats/users`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(`/chat-app/chats/users`);
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to fetch available users";
@@ -20,11 +16,7 @@ export const chatService = {
 
   getAllMessages: async (accessToken, chatId) => {
     try {
-      const response = await axios.get(`${BASE_URL}/messages/${chatId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(`/chat-app/messages/${chatId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to fetch messages";
@@ -33,15 +25,7 @@ export const chatService = {
 
   createOneOnOneChat: async (accessToken, receiverId) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/chats/c/${receiverId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await api.post(`/chat-app/chats/c/${receiverId}`, {});
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to create chat";
@@ -61,12 +45,11 @@ export const chatService = {
         formData.append(`attachments`, file);
       });
 
-      const response = await axios.post(
-        `${BASE_URL}/messages/${chatId}`,
+      const response = await api.post(
+        `/chat-app/messages/${chatId}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "multipart/form-data",
           },
         }
