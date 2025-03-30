@@ -59,4 +59,15 @@ export const chatService = {
       throw error.response?.data?.message || "Failed to send message";
     }
   },
+
+  deleteMessage: async (messageId) => {
+    console.log("iddelete", messageId);
+
+    try {
+      const response = await api.delete(`/chat-app/messages/${messageId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to delete message";
+    }
+  },
 };
