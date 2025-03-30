@@ -1,11 +1,11 @@
 import api from "./api";
 
-const BASE_URL = "https://api.freeapi.app/api/v1/chat-app";
+// const BASE_URL = "https://api.freeapi.app/api/v1/chat-app";
 
 const MAX_ATTACHMENTS = 5;
 
 export const chatService = {
-  getAvailableUsers: async (accessToken) => {
+  getAvailableUsers: async () => {
     try {
       const response = await api.get(`/chat-app/chats/users`);
       return response.data;

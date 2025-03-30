@@ -5,14 +5,12 @@ import { useChat } from "../hooks/useChat";
 
 export const ChatRoom = () => {
   const navigate = useNavigate();
-  const prams  = useParams();
+  const prams = useParams();
   console.log("parms", prams);
   const receiverId = prams.receiverId;
-  const [searchParams, setSearchParams]= useSearchParams()
-  console.log("searchParams", searchParams.get("email"));
-  setSearchParams({role:"this is my email"})
-  
-  
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // console.log("searchParams", searchParams.get("email"));
+  // Removed setSearchParams call that was causing infinite re-renders
 
   const { loading, error, messages, sendingMessage, sendMessage } =
     useChat(receiverId);
@@ -76,8 +74,8 @@ export const ChatRoom = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Chat Room</h2>
             <button
-              onClick={() => navigate(-1)}
-              className="p-2 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-colors"
+              onClick={() => navigate("/onlineusers")}
+              className="p-2 text-gray-500 hover:text-red-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-colors"
             >
               <svg
                 className="w-5 h-5"
