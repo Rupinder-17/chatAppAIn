@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useParams, useSearchParams } from "react-router";
+import { useParams } from "react-router";
 import { useChat } from "../hooks/useChat";
 
 export const ChatRoom = () => {
