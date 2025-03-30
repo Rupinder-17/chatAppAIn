@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { useAuth } from "../hooks/useAuth";
 import { useSearchParams } from "react-router-dom"; // Add this import at the top
@@ -7,11 +7,10 @@ import { useSearchParams } from "react-router-dom"; // Add this import at the to
 export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();
+
   const { logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log("pram", params);
 
   useEffect(() => {
     const query = searchParams.get("q") || "";
@@ -209,7 +208,9 @@ export const OnlineUsers = () => {
                   <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 transform translate-y-full group-hover:translate-y-0 transition-transform duration-200">
                     <button
                       onClick={() => {
-                        navigate(`/chat/${user._id}/${user.username}?email=${user.email}`);
+                        navigate(
+                          `/chat/${user._id}/${user.username}?email=${user.email}`
+                        );
                       }}
                       className="w-full text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"
                     >
