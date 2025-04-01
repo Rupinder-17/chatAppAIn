@@ -1,7 +1,7 @@
 import api from "./api";
 
 class AuthService {
-  baseUrl = "https://api.freeapi.app/api/v1/users";
+  // baseUrl = "https://api.freeapi.app/api/v1/users";
 
   async register(userData) {
     try {

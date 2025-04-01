@@ -22,18 +22,21 @@ export const ChatRoom = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await chatService.createOneOnOneChat(
-          accessToken,
-          receiverId
-        );
+        if (!receiverId.match(/^[0-9a-fA-F]{24}$/)) {
+          throw new Error("Invalid receiver ID format");
+        }
+        const response = await chatService.createOneOnOneChat(receiverId);
+        if (!response.data || !response.data._id) {
+          throw new Error("Failed to create chat: Invalid response");
+        }
         setChatId(response.data._id);
         const messagesResponse = await chatService.getAllMessages(
-          accessToken,
           response.data._id
         );
         setMessages(messagesResponse.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
+        console.error("Chat creation error:", err);
       } finally {
         setLoading(false);
       }
@@ -48,10 +51,7 @@ export const ChatRoom = () => {
     if (chatId) {
       messageInterval = setInterval(async () => {
         try {
-          const messagesResponse = await chatService.getAllMessages(
-            accessToken,
-            chatId
-          );
+          const messagesResponse = await chatService.getAllMessages(chatId);
           setMessages(messagesResponse.data);
         } catch (err) {
           console.error("Failed to fetch messages:", err);
@@ -71,11 +71,8 @@ export const ChatRoom = () => {
 
     try {
       setSendingMessage(true);
-      await chatService.sendMessage(accessToken, chatId, messageInput);
-      const messagesResponse = await chatService.getAllMessages(
-        accessToken,
-        chatId
-      );
+      await chatService.sendMessage(chatId, messageInput);
+      const messagesResponse = await chatService.getAllMessages(chatId);
       setMessages(messagesResponse.data);
       setMessageInput("");
     } catch (err) {
@@ -86,14 +83,13 @@ export const ChatRoom = () => {
   };
 
   const handleDeleteMessage = async (messageId) => {
+    console.log("chatidmess", chatId);
+
     console.log("msgid", messageId);
 
     try {
-      await chatService.deleteMessage(messageId);
-      const messagesResponse = await chatService.getAllMessages(
-        accessToken,
-        chatId
-      );
+      await chatService.deleteMessage(chatId, messageId);
+      const messagesResponse = await chatService.getAllMessages(chatId);
       setMessages(messagesResponse.data);
     } catch (error) {
       alert("Failed to delete message: " + error);
@@ -163,7 +159,7 @@ export const ChatRoom = () => {
               >
                 <div
                   className={`max-w-[70%] p-3 rounded-lg ${
-                    message.sender._id !== receiverId
+                    message.sender._id === receiverId
                       ? "bg-gray-200 text-gray-900"
                       : "bg-indigo-600 text-white"
                   }`}

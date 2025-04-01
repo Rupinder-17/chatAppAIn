@@ -1,7 +1,5 @@
 import api from "./api";
 
-// const BASE_URL = "https://api.freeapi.app/api/v1/chat-app";
-
 const MAX_ATTACHMENTS = 5;
 
 export const chatService = {
@@ -14,7 +12,7 @@ export const chatService = {
     }
   },
 
-  getAllMessages: async (accessToken, chatId) => {
+  getAllMessages: async (chatId) => {
     try {
       const response = await api.get(`/chat-app/messages/${chatId}`);
       return response.data;
@@ -23,7 +21,9 @@ export const chatService = {
     }
   },
 
-  createOneOnOneChat: async (accessToken, receiverId) => {
+  createOneOnOneChat: async (receiverId) => {
+    console.log("receiverIdiiiii:", receiverId);
+    
     try {
       const response = await api.post(`/chat-app/chats/c/${receiverId}`, {});
       return response.data;
@@ -32,7 +32,7 @@ export const chatService = {
     }
   },
 
-  sendMessage: async (accessToken, chatId, message, attachments = []) => {
+  sendMessage: async (chatId, message, attachments = []) => {
     try {
       if (attachments.length > MAX_ATTACHMENTS) {
         throw new Error(`Maximum ${MAX_ATTACHMENTS} attachments are allowed`);
@@ -60,11 +60,11 @@ export const chatService = {
     }
   },
 
-  deleteMessage: async (messageId) => {
-    console.log("iddelete", messageId);
-
+  deleteMessage: async (chatId, messageId) => {
     try {
-      const response = await api.delete(`/chat-app/messages/${messageId}`);
+      const response = await api.delete(
+        `/chat-app/messages/${chatId}/${messageId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to delete message";
