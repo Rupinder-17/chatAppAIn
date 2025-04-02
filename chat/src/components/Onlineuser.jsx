@@ -210,7 +210,7 @@ export const OnlineUsers = () => {
                     <button
                       onClick={() => {
                         navigate(
-                          `/chat/${user._id}/${user.username}?email=${user.email}`
+                          `/chat/${user._id}`
                         );
                       }}
                       className="w-full text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"

@@ -10,6 +10,8 @@ import { useAuth } from "./hooks/useAuth";
 import "./App.css";
 import { OnlineUsers } from "./components/Onlineuser";
 import { ChatRoom } from "./components/ChatRoom";
+import { GroupChatForm } from "./components/GroupChatForm";
+import { GroupChatRoom } from "./components/GroupChatRoom";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -52,14 +54,38 @@ function App() {
           }
         />
         <Route
-          path="/chat/:receiverId/:username"
+          path="/chat/:receiverId"
           element={
             <PrivateRoute>
               <ChatRoom />
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<div><h1>this page is not availble</h1></div>}/>
+        <Route
+          path="/group-chat"
+          element={
+            <PrivateRoute>
+              <GroupChatForm />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/group-chat-room/:groupChatId"
+          element={
+            <PrivateRoute>
+              <GroupChatRoom />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={
+            <div>
+              <h1>this page is not availble</h1>
+            </div>
+          }
+        />
         <Route path="/" element={<Navigate to="/register" />} />
       </Routes>
     </Router>

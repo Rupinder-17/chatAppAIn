@@ -3,6 +3,24 @@ import api from "./api";
 const MAX_ATTACHMENTS = 5;
 
 export const chatService = {
+  createGroupChat: async (name, participants) => {
+    try {
+      if (!Array.isArray(participants) || participants.length < 2) {
+        throw new Error(
+          "A group chat requires at least 3 participants including you"
+        );
+      }
+
+      const response = await api.post(`/chat-app/chats/group`, {
+        name,
+        participants,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to create group chat";
+    }
+  },
+
   getAvailableUsers: async () => {
     try {
       const response = await api.get(`/chat-app/chats/users`);
@@ -23,7 +41,7 @@ export const chatService = {
 
   createOneOnOneChat: async (receiverId) => {
     console.log("receiverIdiiiii:", receiverId);
-    
+
     try {
       const response = await api.post(`/chat-app/chats/c/${receiverId}`, {});
       return response.data;
