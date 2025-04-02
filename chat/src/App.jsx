@@ -80,7 +80,7 @@ function App() {
         />
 
         <Route
-          path="/chats"
+          path="/allchats"
           element={
             <PrivateRoute>
               <ChatList />

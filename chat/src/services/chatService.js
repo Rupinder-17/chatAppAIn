@@ -92,6 +92,8 @@ export const chatService = {
   getAllChats: async () => {
     try {
       const response = await api.get("/chat-app/chats");
+      console.log("Response from getAllChats:", response.data);
+      
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to fetch chats";
