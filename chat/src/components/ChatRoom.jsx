@@ -14,6 +14,7 @@ export const ChatRoom = () => {
   const [chatId, setChatId] = useState(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageInput, setMessageInput] = useState("");
+  const [chatPartner, setChatPartner] = useState(null);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -30,6 +31,9 @@ export const ChatRoom = () => {
           throw new Error("Failed to create chat: Invalid response");
         }
         setChatId(response.data._id);
+        setChatPartner(
+          response.data.participants.find((p) => p._id === receiverId)
+        );
         const messagesResponse = await chatService.getAllMessages(
           response.data._id
         );
@@ -123,7 +127,9 @@ export const ChatRoom = () => {
       <div className="max-w-7xl mx-auto p-8">
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Chat Room</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {chatPartner ? chatPartner.username : "Loading..."}
+            </h2>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate("/onlineusers")}

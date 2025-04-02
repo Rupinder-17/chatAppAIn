@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { useAuth } from "../hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
+import { AllChats } from "./AllChats";
 
 export const OnlineUsers = () => {
   const navigate = useNavigate();
@@ -91,6 +92,7 @@ export const OnlineUsers = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Online Users</h2>
+              <AllChats/>
               <p className="text-gray-500 mt-1">
                 {filteredUsers.length}{" "}
                 {filteredUsers.length === 1 ? "user" : "users"} online
