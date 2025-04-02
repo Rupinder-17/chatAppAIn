@@ -12,6 +12,7 @@ import { OnlineUsers } from "./components/Onlineuser";
 import { ChatRoom } from "./components/ChatRoom";
 import { GroupChatForm } from "./components/GroupChatForm";
 import { GroupChatRoom } from "./components/GroupChatRoom";
+import { ChatList } from "./components/ChatList";
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -20,9 +21,9 @@ const PrivateRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  console.log("user",user);
-  
-  return !user ? children : <Navigate to="/onlineusers" />;
+  console.log("user", user);
+
+  return !user ? children : <Navigate to="/chats" />;
 };
 
 function App() {
@@ -78,6 +79,14 @@ function App() {
           }
         />
 
+        <Route
+          path="/chats"
+          element={
+            <PrivateRoute>
+              <ChatList />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="*"
           element={

@@ -65,7 +65,14 @@ export const GroupChatForm = () => {
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="flex gap-6 items-center">
+
+      <button className="bg-blue-600 text-white px-3 py-1 rounded-xl" onClick={()=>{
+        navigate('/onlineusers')
+      }}>go back</button>
       <h2 className="text-2xl font-bold mb-6">Create Group Chat</h2>
+      </div>
+      
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
       )}

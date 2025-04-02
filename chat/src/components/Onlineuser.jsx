@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { useAuth } from "../hooks/useAuth";
-import { useSearchParams } from "react-router-dom"; // Add this import at the top
+import { useSearchParams } from "react-router-dom";
 
 export const OnlineUsers = () => {
   const navigate = useNavigate();
   const { onlineUsers, loading, error, refreshUsers } = useOnlineUsers();
-
   const { logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,6 +34,10 @@ export const OnlineUsers = () => {
   const filteredUsers = onlineUsers.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // const handlePageChange = (pageNumber) => {
+  //   setCurrentPage(pageNumber);
+  // };
 
   if (loading) {
     return (
@@ -157,83 +160,95 @@ export const OnlineUsers = () => {
                   />
                 </svg>
               </button>
+              <button
+                className="bg-blue-500 text-white px-2 rounded-2xl hover:bg-blue-800"
+                onClick={() => {
+                  navigate("/group-chat");
+                }}
+              >
+                create group
+              </button>
             </div>
           </div>
 
           {filteredUsers.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredUsers.map((user) => (
-                <div
-                  key={user._id}
-                  className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
-                >
-                  <div className="p-4 ">
-                    <div className="flex items-center  w- justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="relative flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-lg font-semibold">
-                              {user.username?.[0]?.toUpperCase() || "U"}
-                            </span>
+            <>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredUsers.map((user) => (
+                  <div
+                    key={user._id}
+                    className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
+                  >
+                    <div className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="relative flex-shrink-0">
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-lg font-semibold">
+                                {user.username?.[0]?.toUpperCase() || "U"}
+                              </span>
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></div>
                           </div>
-                          <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 truncate">
+                              {user.username}
+                            </h3>
+                            <p className="text-sm text-green-500 font-medium flex items-center">
+                              <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+                              Active now
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 truncate">
-                            {user.username}
-                          </h3>
-                          <p className="text-sm text-green-500 font-medium flex items-center">
-                            <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-                            Active now
-                          </p>
-                        </div>
+                        <button className="flex-shrink-0 p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                            />
+                          </svg>
+                        </button>
                       </div>
-                      <button className="flex-shrink-0 p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                    </div>
+                    <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 transform translate-y-full group-hover:translate-y-0 transition-transform duration-200">
+                      <button
+                        onClick={() => {
+                          navigate(`/chat/${user._id}`);
+                        }}
+                        className="w-full text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"
+                      >
                         <svg
-                          className="w-5 h-5"
+                          className="w-4 h-4 mr-1.5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                        
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth="2"
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                           />
                         </svg>
+                        Send Message
                       </button>
                     </div>
                   </div>
-                  <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 transform translate-y-full group-hover:translate-y-0 transition-transform duration-200">
-                    <button
-                      onClick={() => {
-                        navigate(
-                          `/chat/${user._id}`
-                        );
-                      }}
-                      className="w-full text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"
-                    >
-                      <svg
-                        className="w-4 h-4 mr-1.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                        />
-                      </svg>
-                      Send Message
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {/* <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              /> */}
+            </>
           ) : (
             <div className="bg-gray-50 rounded-xl p-8 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
@@ -262,7 +277,7 @@ export const OnlineUsers = () => {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600  rounded-lg hover:bg-indigo-100 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors"
                 >
                   <svg
                     className="w-4 h-4 mr-1.5"

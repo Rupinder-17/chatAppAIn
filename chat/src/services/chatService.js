@@ -88,4 +88,13 @@ export const chatService = {
       throw error.response?.data?.message || "Failed to delete message";
     }
   },
+
+  getAllChats: async () => {
+    try {
+      const response = await api.get("/chat-app/chats");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to fetch chats";
+    }
+  },
 };
