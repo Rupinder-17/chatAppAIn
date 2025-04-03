@@ -15,6 +15,8 @@ export const chatService = {
         name,
         participants,
       });
+      console.log("Response from createGroupChat:", response.data);
+      
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to create group chat";

@@ -7,13 +7,14 @@ import { chatService } from "../services/chatService";
 export const GroupChatRoom = () => {
   const navigate = useNavigate();
   const { groupChatId } = useParams();
-  const { accessToken } = useAuth();
+  const { accessToken,user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageInput, setMessageInput] = useState("");
+  const [groupName, setGroupName] = useState("");
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -23,11 +24,9 @@ export const GroupChatRoom = () => {
         setLoading(true);
         setError(null);
         setChatId(groupChatId);
-        const messagesResponse = await chatService.getAllMessages(
-          // response.data._id
-          groupChatId
-        );
-        setMessages(messagesResponse.data);
+        const messagesResponse = await chatService.getAllMessages(groupChatId);
+        setMessages(messagesResponse.data.messages || []);
+        setGroupName(messagesResponse.data.chat?.name);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
         console.error("Chat creation error:", err);
@@ -85,8 +84,9 @@ export const GroupChatRoom = () => {
       await chatService.deleteMessage(chatId, messageId);
       const messagesResponse = await chatService.getAllMessages(chatId);
       setMessages(messagesResponse.data);
-    } catch (error) {
-      alert("Failed to delete message: " + error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete message");
+      console.error("Message deletion error:", err);
     }
   };
 
@@ -117,7 +117,7 @@ export const GroupChatRoom = () => {
       <div className="max-w-7xl mx-auto p-8">
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Chat Room</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{groupName}</h2>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate("/onlineusers")}
@@ -146,21 +146,31 @@ export const GroupChatRoom = () => {
               <div
                 key={message._id}
                 className={`flex ${
-                  message.sender._id === groupChatId
-                    ? "justify-start"
-                    : "justify-end"
+                  message.sender._id === user._id
+                    ? "justify-end "
+                    : "justify-start"
                 }`}
               >
                 <div
                   className={`max-w-[70%] p-3 rounded-lg ${
-                    message.sender._id === groupChatId
-                      ? "bg-gray-200 text-gray-900"
-                      : "bg-indigo-600 text-white"
+                    message.sender._id === user._id
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-200 text-gray-900"
                   }`}
                 >
-                  <p className="break-words">{message.content}</p>
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg font-semibold">
+                      {message.sender.username[0]?.toUpperCase() || "U"}
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    {message.sender._id !== user._id && (
+                      <p className="text-sm">{message.sender.username}</p>
+                    )}
+                    <p className="break-words">{message.content}</p>
+                  </div>
                   <div className="flex justify-between items-center mt-2">
-                    {message.sender._id !== groupChatId && (
+                    {message.sender._id === user._id && (
                       <button
                         onClick={() => handleDeleteMessage(message._id)}
                         className="text-xs opacity-70 hover:opacity-100"

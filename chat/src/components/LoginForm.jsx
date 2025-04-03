@@ -22,7 +22,7 @@ export const LoginForm = () => {
     e.preventDefault();
     try {
       await login(formData.email, formData.password);
-      navigate("/onlineusers");
+      navigate("/allchats");
     } catch (err) {
       // Error is handled by useAuth hook
       console.log(err);
