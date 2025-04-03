@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { useAuth } from "../hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
-import { AllChats } from "./AllChats";
 
 export const OnlineUsers = () => {
   const navigate = useNavigate();

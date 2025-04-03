@@ -12,22 +12,36 @@ export const ChatList = () => {
     const fetchChats = async () => {
       try {
         const response = await chatService.getAllChats();
-        setChats(response.data);
+        console.log("Fetched chats:", response);
+        if (response && response.data) {
+          setChats(response.data);
+        } else {
+          throw new Error("Invalid response structure");
+        }
       } catch (err) {
         setError("Failed to fetch chats");
-        console.error(err);
+        console.error("Error fetching chats:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchChats();
   }, []);
 
   const handleChatClick = (chat) => {
+    console.log("Chat clicked:", chat);
     if (chat.isGroupChat) {
       navigate(`/group-chat-room/${chat._id}`);
     } else {
-      navigate(`/chat-room/${chat._id}`);
+      const otherParticipant = chat.participants.find(
+        (p) => p._id !== localStorage.getItem("userId")
+      );
+      if (otherParticipant) {
+        navigate(`/chat/${otherParticipant._id}`);
+      } else {
+        console.error("Could not find other participant in chat");
+      }
     }
   };
 
