@@ -132,7 +132,7 @@ export const ChatRoom = () => {
             </h2>
             <div className="flex gap-2">
               <button
-                onClick={() => navigate("/onlineusers")}
+                onClick={() => navigate("/allchats")}
                 className="p-2 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Back to Users"
               >

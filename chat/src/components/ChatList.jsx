@@ -36,8 +36,12 @@ export const ChatList = () => {
     } else {
       const otherParticipant = chat.participants.find(
         (p) => p._id !== localStorage.getItem("userId")
+        
       );
+      console.log("Other participant:", otherParticipant);
+      
       if (otherParticipant) {
+        console.log("Navigating to chat with ID:", otherParticipant._id);
         navigate(`/chat/${otherParticipant._id}`);
       } else {
         console.error("Could not find other participant in chat");
