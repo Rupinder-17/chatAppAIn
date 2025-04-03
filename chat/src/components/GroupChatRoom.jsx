@@ -25,8 +25,8 @@ export const GroupChatRoom = () => {
         setError(null);
         setChatId(groupChatId);
         const messagesResponse = await chatService.getAllMessages(groupChatId);
-        setMessages(messagesResponse.data.messages || []);
-        setGroupName(messagesResponse.data.chat?.name);
+        setMessages(messagesResponse.data || []);
+        setGroupName(messagesResponse.data?.chat?.name);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
         console.error("Chat creation error:", err);

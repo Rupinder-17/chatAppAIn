@@ -37,7 +37,7 @@ export const ChatRoom = () => {
         const messagesResponse = await chatService.getAllMessages(
           response.data._id
         );
-        setMessages(messagesResponse.data);
+        setMessages(messagesResponse.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
         console.error("Chat creation error:", err);
@@ -56,7 +56,7 @@ export const ChatRoom = () => {
       messageInterval = setInterval(async () => {
         try {
           const messagesResponse = await chatService.getAllMessages(chatId);
-          setMessages(messagesResponse.data);
+          setMessages(messagesResponse.data || []);
         } catch (err) {
           console.error("Failed to fetch messages:", err);
         }
@@ -77,7 +77,7 @@ export const ChatRoom = () => {
       setSendingMessage(true);
       await chatService.sendMessage(chatId, messageInput);
       const messagesResponse = await chatService.getAllMessages(chatId);
-      setMessages(messagesResponse.data);
+      setMessages(messagesResponse.data );
       setMessageInput("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send message");
@@ -94,7 +94,7 @@ export const ChatRoom = () => {
     try {
       await chatService.deleteMessage(chatId, messageId);
       const messagesResponse = await chatService.getAllMessages(chatId);
-      setMessages(messagesResponse.data);
+      setMessages(messagesResponse.data || []);
     } catch (error) {
       alert("Failed to delete message: " + error);
     }
