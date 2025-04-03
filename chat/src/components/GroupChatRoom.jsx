@@ -147,7 +147,7 @@ export const GroupChatRoom = () => {
           </div>
 
           <div className="space-y-4 p-4 h-[calc(100vh-16rem)] overflow-y-auto bg-gray-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-            {messages.map((message) => (
+            {[...messages].reverse().map((message) => (
               <div
                 key={message._id}
                 className={`flex ${
@@ -164,9 +164,11 @@ export const GroupChatRoom = () => {
                   } items-start space-x-2 max-w-[80%]`}
                 >
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-md">
+                    <div className={`w-8 h-8 bg-gradient-to-br ${message.sender._id !== user._id ? "from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-md":""}`}>
                       <span className="text-white text-sm font-semibold">
-                        {message.sender.username[0]?.toUpperCase() || "U"}
+                        {message.sender._id !== user._id &&(
+                           message.sender.username[0].toUpperCase()
+                        )}
                       </span>
                     </div>
                   </div>

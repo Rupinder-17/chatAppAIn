@@ -154,7 +154,7 @@ export const ChatRoom = () => {
           </div>
 
           <div className="space-y-4 mb-6 h-[calc(100vh-20rem)] overflow-y-auto p-4 bg-gray-50 rounded-lg">
-            {messages.map((message) => (
+        {[...messages].reverse().map((message) => (
               <div
                 key={message._id}
                 className={`flex ${

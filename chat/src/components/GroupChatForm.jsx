@@ -53,8 +53,6 @@ export const GroupChatForm = () => {
         selectedUsers
       );
       navigate(`/group-chat-room/${response.data._id}`);
-    
-      
     } catch (err) {
       setError(err.message || "Failed to create group chat");
       console.error(err);
@@ -64,23 +62,54 @@ export const GroupChatForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <div className="flex gap-6 items-center">
-
-      <button className="bg-blue-600 text-white px-3 py-1 rounded-xl" onClick={()=>{
-        navigate('/onlineusers')
-      }}>go back</button>
-      <h2 className="text-2xl font-bold mb-6">Create Group Chat</h2>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center gap-2"
+          onClick={() => navigate("/allchats")}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          
+        </button>
+        <h2 className="text-2xl font-bold text-gray-900">Create Group Chat</h2>
       </div>
-      
+
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          {error}
+        </div>
       )}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
           <label
             htmlFor="groupName"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             Group Name
           </label>
@@ -89,32 +118,40 @@ export const GroupChatForm = () => {
             id="groupName"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="Enter group name"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+            placeholder="Enter a memorable group name"
             required
           />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Participants (minimum 2)
           </label>
-          <div className="max-h-60 overflow-y-auto border rounded-md p-2">
+          <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
             {availableUsers.map((user) => (
               <div
                 key={user._id}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
+                className="flex items-center p-3 hover:bg-gray-50 transition-colors duration-200"
               >
+                <div className="flex-1 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
+                    {user.username[0].toUpperCase()}
+                  </div>
+                  <label
+                    htmlFor={user._id}
+                    className="flex-1 text-sm text-gray-700 font-medium cursor-pointer"
+                  >
+                    {user.username}
+                  </label>
+                </div>
                 <input
                   type="checkbox"
                   id={user._id}
                   checked={selectedUsers.includes(user._id)}
                   onChange={() => handleUserSelect(user._id)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 transition-colors duration-200 cursor-pointer"
                 />
-                <label htmlFor={user._id} className="text-sm text-gray-700">
-                  {user.username}
-                </label>
               </div>
             ))}
           </div>
@@ -123,9 +160,35 @@ export const GroupChatForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 text-sm font-medium"
         >
-          {loading ? "Creating..." : "Create Group Chat"}
+          {loading ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Creating...
+            </>
+          ) : (
+            "Create Group Chat"
+          )}
         </button>
       </form>
     </div>
