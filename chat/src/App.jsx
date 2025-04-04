@@ -23,7 +23,7 @@ const PublicRoute = ({ children }) => {
   const { user } = useAuth();
   console.log("user", user);
 
-  return !user ? children : <Navigate to="/chats" />;
+  return !user ? children : <Navigate to="/allchats" />;
 };
 
 function App() {
