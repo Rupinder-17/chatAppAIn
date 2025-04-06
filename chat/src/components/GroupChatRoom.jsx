@@ -15,6 +15,12 @@ export const GroupChatRoom = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageInput, setMessageInput] = useState("");
   const [groupName, setGroupName] = useState("");
+  const [groupDetails, setGroupDetails] = useState(null);
+  const [showParticipants, setShowParticipants] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [updatingName, setUpdatingName] = useState(false);
+  console.log("groupdetails", groupDetails);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -24,9 +30,20 @@ export const GroupChatRoom = () => {
         setLoading(true);
         setError(null);
         setChatId(groupChatId);
-        const messagesResponse = await chatService.getAllMessages(groupChatId);
+        const [messagesResponse, groupDetailsResponse] = await Promise.all([
+          chatService.getAllMessages(groupChatId),
+          chatService.getGroupChatDetails(groupChatId),
+        ]);
+        console.log(
+          "messages",
+          messagesResponse,
+          "groupdetails",
+          groupDetailsResponse
+        );
+
         setMessages(messagesResponse.data || []);
-        setGroupName(messagesResponse.data?.chat?.name);
+        setGroupDetails(groupDetailsResponse.data);
+        setGroupName(groupDetailsResponse.data?.name);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create chat");
         console.error("Chat creation error:", err);
@@ -113,127 +130,286 @@ export const GroupChatRoom = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg font-semibold">
-                  {groupName?.[0]?.toUpperCase() || "G"}
-                </span>
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+          <div className="flex flex-col h-[calc(100vh-4rem)]">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
+                  <span className="text-white text-xl font-semibold">
+                    {groupName?.[0]?.toUpperCase() || "G"}
+                  </span>
+                </div>
+                <div>
+                  {isEditingName ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                        className="text-xl font-bold text-gray-900 border-b-2 border-indigo-500 focus:outline-none bg-transparent"
+                        placeholder="Enter new group name"
+                        disabled={updatingName}
+                      />
+                      <button
+                        onClick={async () => {
+                          if (!newGroupName.trim()) return;
+                          try {
+                            setUpdatingName(true);
+                            await chatService.updateGroupChatName(
+                              groupChatId,
+                              newGroupName
+                            );
+                            setGroupName(newGroupName);
+                            setIsEditingName(false);
+                          } catch (err) {
+                            setError(
+                              err.message || "Failed to update group name"
+                            );
+                          } finally {
+                            setUpdatingName(false);
+                          }
+                        }}
+                        disabled={updatingName || !newGroupName.trim()}
+                        className="p-1 text-indigo-600 hover:text-indigo-700 disabled:text-gray-400"
+                      >
+                        {updatingName ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingName(false);
+                          setNewGroupName(groupName);
+                        }}
+                        className="p-1 text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {groupName}
+                      </h2>
+                      <button
+                        onClick={() => {
+                          setNewGroupName(groupName);
+                          setIsEditingName(true);
+                        }}
+                        className="p-1 text-gray-500 hover:text-indigo-600 transition-colors"
+                        title="Edit Group Name"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+                    {groupDetails?.participants?.length} participants
+                  </p>
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{groupName}</h2>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setShowParticipants(!showParticipants)}
+                  className="p-3 text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  title="View Participants"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => navigate("/allchats")}
+                  className="p-3 text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  title="Back to Chats"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-            <button
-              onClick={() => navigate("/allchats")}
-              className="p-2 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-all duration-200 transform hover:scale-105"
-              title="Back to Users"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-            </button>
-          </div>
 
-          <div className="space-y-4 p-4 h-[calc(100vh-16rem)] overflow-y-auto bg-gray-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-            {[...messages].reverse().map((message) => (
-              <div
-                key={message._id}
-                className={`flex ${
-                  message.sender._id === user._id
-                    ? "justify-end"
-                    : "justify-start"
-                } animate-fade-in`}
-              >
+            {showParticipants && (
+              <div className="p-4 bg-gray-50 border-b border-gray-200 animate-fadeIn">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Participants
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {groupDetails?.participants?.map((participant) => (
+                    <div
+                      key={participant._id}
+                      className="flex items-center space-x-2 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
+                      <div className="w-10  h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-md">
+                        <span
+                          className={`${
+                            participant._id !== user._id
+                              ? participant.username[0].toUpperCase()
+                              : ""
+                          }text-white text-sm font-semibold`}
+                        ></span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 truncate">
+                        {participant.username}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-4 space-y-4">
+              {[...messages].reverse().map((message) => (
                 <div
+                  key={message._id}
                   className={`flex ${
                     message.sender._id === user._id
-                      ? "flex-row-reverse"
-                      : "flex-row"
-                  } items-start space-x-2 max-w-[80%]`}
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
                 >
-                  <div className="flex-shrink-0">
-                    <div className={`w-8 h-8 bg-gradient-to-br ${message.sender._id !== user._id ? "from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-md":""}`}>
-                      <span className="text-white text-sm font-semibold">
-                        {message.sender._id !== user._id &&(
-                           message.sender.username[0].toUpperCase()
-                        )}
-                      </span>
-                    </div>
-                  </div>
                   <div
-                    className={`flex flex-col ${
+                    className={`flex ${
                       message.sender._id === user._id
-                        ? "items-end"
-                        : "items-start"
-                    }`}
+                        ? "flex-row-reverse"
+                        : "flex-row"
+                    } items-start space-x-2 max-w-[80%] group`}
                   >
-                    {message.sender._id !== user._id && (
-                      <span className="text-xs text-gray-500 mb-1">
-                        {message.sender.username}
-                      </span>
-                    )}
+                    <div className="flex-shrink-0 pt-1">
+                      <div
+                        className={`w-8 h-8 bg-gradient-to-br ${
+                          message.sender._id === user._id
+                            ? ""
+                            : "from-gray-400 to-gray-900 rounded-full flex items-center justify-center shadow-md transform transition-transform duration-200 group-hover:scale-110"
+                        } `}
+                      >
+                        <span className="text-white text-sm font-semibold">
+                          {message.sender._id == user._id
+                            ? message.sender.username[0].toUpperCase()
+                            : ""}
+                        </span>
+                      </div>
+                    </div>
                     <div
-                      className={`p-3 rounded-2xl ${
+                      className={`flex flex-col ${
                         message.sender._id === user._id
-                          ? "bg-indigo-600 text-white rounded-tr-none"
-                          : "bg-white text-gray-900 rounded-tl-none shadow-sm border border-gray-100"
+                          ? "items-end"
+                          : "items-start"
                       }`}
                     >
-                      <p className="break-words text-sm">{message.content}</p>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-xs text-gray-400">
-                        {new Date(message.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      {message.sender._id === user._id && (
-                        <button
-                          onClick={() => handleDeleteMessage(message._id)}
-                          className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-                          title="Delete Message"
-                        >
-                          Delete
-                        </button>
+                      {message.sender._id !== user._id && (
+                        <span className="text-xs font-medium text-gray-500 mb-1">
+                          {message.sender.username}
+                        </span>
                       )}
+                      <div
+                        className={`p-3 rounded-2xl ${
+                          message.sender._id === user._id
+                            ? "bg-indigo-600 text-white rounded-tr-none shadow-md"
+                            : "bg-white text-gray-900 rounded-tl-none shadow-md border border-gray-100"
+                        }`}
+                      >
+                        <p className="break-words text-sm leading-relaxed">
+                          {message.content}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className="text-xs text-gray-400">
+                          {new Date(message.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                        {message.sender._id === user._id && (
+                          <button
+                            onClick={() => handleDeleteMessage(message._id)}
+                            className="text-xs text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Delete Message"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="p-4 bg-white border-t border-gray-200">
-            <div className="flex gap-3 items-center">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Type your message..."
-                className="flex-1 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                disabled={sendingMessage}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={sendingMessage}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {sendingMessage ? "Sending..." : "Send"}
-              </button>
+            <div className="p-4 bg-white border-t border-gray-200">
+              <div className="flex gap-3 items-center">
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  placeholder="Type your message..."
+                  className="flex-1 p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+                  disabled={sendingMessage}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={sendingMessage}
+                  className="px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-md"
+                >
+                  {sendingMessage ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : (
+                    "Send"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

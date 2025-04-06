@@ -16,7 +16,7 @@ export const chatService = {
         participants,
       });
       console.log("Response from createGroupChat:", response.data);
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to create group chat";
@@ -95,10 +95,32 @@ export const chatService = {
     try {
       const response = await api.get("/chat-app/chats");
       console.log("Response from getAllChats:", response.data);
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data?.message || "Failed to fetch chats";
+    }
+  },
+
+  getGroupChatDetails: async (chatId) => {
+    try {
+      const response = await api.get(`/chat-app/chats/group/${chatId}`);
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.message || "Failed to fetch group chat details"
+      );
+    }
+  },
+
+  updateGroupChatName: async (chatId, newName) => {
+    try {
+      const response = await api.patch(`/chat-app/chats/group/${chatId}`, {
+        name: newName,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to update group chat name";
     }
   },
 };
