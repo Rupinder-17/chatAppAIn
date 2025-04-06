@@ -119,7 +119,7 @@ export const GroupChatRoom = () => {
       setAddingParticipant(true);
       await Promise.all(
         selectedUsersToAdd.map((userId) =>
-          chatService.addParticipantToGroup(groupChatId, userId)
+          chatService.addParticipant(groupChatId, userId)
         )
       );
       const updatedGroupDetails = await chatService.getGroupChatDetails(
