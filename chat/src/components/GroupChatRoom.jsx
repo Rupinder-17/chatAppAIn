@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { chatService } from "../services/chatService";
+import { useOnlineUsers } from "../hooks/useOnlineUsers";
 
 export const GroupChatRoom = () => {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ export const GroupChatRoom = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [updatingName, setUpdatingName] = useState(false);
+  const [showAddParticipants, setShowAddParticipants] = useState(false);
+  const { onlineUsers } = useOnlineUsers();
+  const [addingParticipant, setAddingParticipant] = useState(false);
   console.log("groupdetails", groupDetails);
 
   useEffect(() => {
@@ -242,6 +246,25 @@ export const GroupChatRoom = () => {
                   </svg>
                 </button>
                 <button
+                  onClick={() => setShowAddParticipants(true)}
+                  className="p-3 text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  title="Add Participants"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
+                  </svg>
+                </button>
+                <button
                   onClick={() => navigate("/allchats")}
                   className="p-3 text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   title="Back to Chats"
@@ -414,6 +437,101 @@ export const GroupChatRoom = () => {
           </div>
         </div>
       </div>
+
+      {showAddParticipants && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Add Participants
+                </h3>
+                <button
+                  onClick={() => setShowAddParticipants(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              <div className="space-y-4">
+                {onlineUsers
+                  .filter(
+                    (user) =>
+                      !groupDetails?.participants?.some(
+                        (p) => p._id === user._id
+                      )
+                  )
+                  .map((user) => (
+                    <div
+                      key={user._id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-semibold">
+                            {user.username[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="font-medium text-gray-900">
+                          {user.username}
+                        </span>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            setAddingParticipant(true);
+                            await chatService.addParticipant(
+                              groupChatId,
+                              user._id
+                            );
+                            const updatedDetails =
+                              await chatService.getGroupChatDetails(
+                                groupChatId
+                              );
+                            setGroupDetails(updatedDetails.data);
+                            setShowAddParticipants(false);
+                          } catch (err) {
+                            setError(
+                              err.message || "Failed to add participant"
+                            );
+                          } finally {
+                            setAddingParticipant(false);
+                          }
+                        }}
+                        disabled={addingParticipant}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {addingParticipant ? "Adding..." : "Add"}
+                      </button>
+                    </div>
+                  ))}
+                {onlineUsers.filter(
+                  (user) =>
+                    !groupDetails?.participants?.some((p) => p._id === user._id)
+                ).length === 0 && (
+                  <p className="text-center text-gray-500 py-4">
+                    No users available to add
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

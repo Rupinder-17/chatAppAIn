@@ -123,4 +123,18 @@ export const chatService = {
       throw error.response?.data?.message || "Failed to update group chat name";
     }
   },
+
+  addParticipant: async (chatId, participantId) => {
+    try {
+      const response = await api.post(
+        `/chat-app/chats/group/${chatId}/${participantId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.message ||
+        "Failed to add participant to group chat"
+      );
+    }
+  },
 };
