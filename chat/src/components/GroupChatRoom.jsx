@@ -24,6 +24,8 @@ export const GroupChatRoom = () => {
   const [showAddParticipants, setShowAddParticipants] = useState(false);
   const { onlineUsers } = useOnlineUsers();
   const [addingParticipant, setAddingParticipant] = useState(false);
+  const [selectedUsersToAdd, setSelectedUsersToAdd] = useState([]);
+
   console.log("groupdetails", groupDetails);
 
   useEffect(() => {
@@ -108,6 +110,28 @@ export const GroupChatRoom = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete message");
       console.error("Message deletion error:", err);
+    }
+  };
+  const handleAddParticipants = async () => {
+    if (selectedUsersToAdd.length === 0) return;
+
+    try {
+      setAddingParticipant(true);
+      await Promise.all(
+        selectedUsersToAdd.map((userId) =>
+          chatService.addParticipantToGroup(groupChatId, userId)
+        )
+      );
+      const updatedGroupDetails = await chatService.getGroupChatDetails(
+        groupChatId
+      );
+      setGroupDetails(updatedGroupDetails.data);
+      setSelectedUsersToAdd([]);
+      setShowAddParticipants(false);
+    } catch (err) {
+      setError(err.message || "Failed to add participants");
+    } finally {
+      setAddingParticipant(false);
     }
   };
 
@@ -448,7 +472,7 @@ export const GroupChatRoom = () => {
                 </h3>
                 <button
                   onClick={() => setShowAddParticipants(false)}
-                  className="text-gray-400 hover:text-gray-500"
+                  className="text-gray-400 hover:text-gray-500 transition-colors"
                 >
                   <svg
                     className="w-6 h-6"
@@ -467,67 +491,77 @@ export const GroupChatRoom = () => {
               </div>
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {onlineUsers
                   .filter(
-                    (user) =>
+                    (onlineUser) =>
+                      onlineUser._id !== user._id &&
                       !groupDetails?.participants?.some(
-                        (p) => p._id === user._id
+                        (p) => p._id === onlineUser._id
                       )
                   )
-                  .map((user) => (
+                  .map((onlineUser) => (
                     <div
-                      key={user._id}
+                      key={onlineUser._id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold">
-                            {user.username[0].toUpperCase()}
+                            {onlineUser.username[0].toUpperCase()}
                           </span>
                         </div>
                         <span className="font-medium text-gray-900">
-                          {user.username}
+                          {onlineUser.username}
                         </span>
                       </div>
-                      <button
-                        onClick={async () => {
-                          try {
-                            setAddingParticipant(true);
-                            await chatService.addParticipant(
-                              groupChatId,
-                              user._id
-                            );
-                            const updatedDetails =
-                              await chatService.getGroupChatDetails(
-                                groupChatId
-                              );
-                            setGroupDetails(updatedDetails.data);
-                            setShowAddParticipants(false);
-                          } catch (err) {
-                            setError(
-                              err.message || "Failed to add participant"
-                            );
-                          } finally {
-                            setAddingParticipant(false);
-                          }
+                      <input
+                        type="checkbox"
+                        checked={selectedUsersToAdd.includes(onlineUser._id)}
+                        onChange={() => {
+                          setSelectedUsersToAdd((prev) =>
+                            prev.includes(onlineUser._id)
+                              ? prev.filter((id) => id !== onlineUser._id)
+                              : [...prev, onlineUser._id]
+                          );
                         }}
-                        disabled={addingParticipant}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        {addingParticipant ? "Adding..." : "Add"}
-                      </button>
+                        className="h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 transition-colors duration-200"
+                      />
                     </div>
                   ))}
-                {onlineUsers.filter(
-                  (user) =>
-                    !groupDetails?.participants?.some((p) => p._id === user._id)
-                ).length === 0 && (
-                  <p className="text-center text-gray-500 py-4">
-                    No users available to add
-                  </p>
-                )}
               </div>
+            </div>
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={handleAddParticipants}
+                disabled={selectedUsersToAdd.length === 0 || addingParticipant}
+                className="w-full py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                {addingParticipant ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Adding...
+                  </>
+                ) : (
+                  `Add ${selectedUsersToAdd.length} Participant${
+                    selectedUsersToAdd.length !== 1 ? "s" : ""
+                  }`
+                )}
+              </button>
             </div>
           </div>
         </div>
