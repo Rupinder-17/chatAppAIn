@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { chatService } from "../services/chatService";
+import { useAuth } from "../hooks/useAuth";
 
 export const ChatList = () => {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const {user} = useAuth();
+  console.log("User:", user);
+  console.log("User ID:", user?._id);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -35,7 +39,7 @@ export const ChatList = () => {
       navigate(`/group-chat-room/${chat._id}`);
     } else {
       const otherParticipant = chat.participants.find(
-        (p) => p._id !== localStorage.getItem("userId")
+        (p) => p._id !== user._id
         
       );
       console.log("Other participant:", otherParticipant);
@@ -97,7 +101,7 @@ export const ChatList = () => {
           const otherParticipant = chat.isGroupChat
             ? null
             : chat.participants.find(
-                (p) => p._id !== localStorage.getItem("userId")
+                (p) => p._id !== user._id
               );
           const initial = chat.isGroupChat
             ? chat.name[0]?.toUpperCase()

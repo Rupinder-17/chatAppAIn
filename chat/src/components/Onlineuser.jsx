@@ -168,7 +168,7 @@ export const OnlineUsers = () => {
                 onClick={() => {
                   navigate("/group-chat");
                 }}
-                className="p-2 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="p-2 text-green-100  bg-green-700  rounded-lg transition-colors"
                 title="Create Group Chat"
               >
                 <svg
