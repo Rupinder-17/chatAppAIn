@@ -137,4 +137,18 @@ export const chatService = {
       );
     }
   },
+
+  removeParticipant: async (chatId, participantId) => {
+    try {
+      const response = await api.delete(
+        `/chat-app/chats/group/${chatId}/${participantId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.message ||
+        "Failed to remove participant from group chat"
+      );
+    }
+  },
 };
