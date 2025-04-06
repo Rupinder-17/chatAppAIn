@@ -395,7 +395,7 @@ export const GroupChatRoom = () => {
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center space-x-2">
                             <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-md">
-                              <span className="text-white text-sm font-semibold">
+                              <span className="text-white  text-sm font-semibold">
                                 {user.username[0].toUpperCase()}
                               </span>
                             </div>
@@ -486,35 +486,42 @@ export const GroupChatRoom = () => {
                   }`}
                 >
                   <div
-                    className={`max-w-[70%] p-3 rounded-lg ${
+                    className={`group relative max-w-[70%] p-3 rounded-lg ${
                       message.sender._id === user._id
                         ? "bg-indigo-600 text-white"
                         : "bg-gray-200 text-gray-900"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium">
-                        {message.sender.username}
-                      </span>
-                      <span className="text-xs opacity-75">
-                        {new Date(message.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
                     <p className="break-words">{message.content}</p>
-                    {message.sender._id === user._id && (
-                      <div className="flex justify-end mt-1">
+                    <span className="text-xs opacity-75">
+                      {new Date(message.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    <div className="flex justify-between items-center py-0.5  mt-2">
+                      {message.sender._id === user._id && (
                         <button
                           onClick={() => handleDeleteMessage(message._id)}
-                          className="text-xs opacity-70 hover:opacity-100 transition-opacity"
+                          className="absolute top-16 right-4 text-xs opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity duration-200"
                           title="Delete Message"
                         >
-                          Delete
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
