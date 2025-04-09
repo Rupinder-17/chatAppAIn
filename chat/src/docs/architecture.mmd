@@ -1,0 +1,53 @@
+graph TD
+    %% Authentication Flow
+    Start((Start)) --> Login{Login/Register?}
+    Login -->|New User| Register[Register Form]
+    Login -->|Existing User| LoginForm[Login Form]
+    Register --> AuthService[Auth Service]
+    LoginForm --> AuthService
+    AuthService -->|Success| Dashboard[Dashboard/Chat List]
+    AuthService -->|Failure| Login
+
+    %% Main Application Flow
+    Dashboard --> |View Chats| ChatList[Chat List]
+    Dashboard --> |View Users| OnlineUsers[Online Users]
+    
+    %% Chat Interactions
+    OnlineUsers -->|Select User| StartChat{Start Chat?}
+    StartChat -->|Yes| ChatRoom[Chat Room]
+    StartChat -->|No| Dashboard
+    
+    ChatList -->|Open Existing| ChatRoom
+    ChatList -->|Create Group| GroupChat[Group Chat Form]
+    GroupChat -->|Created| GroupChatRoom[Group Chat Room]
+    
+    %% Chat Room Components
+    ChatRoom --> MessageList[Message List]
+    ChatRoom --> MessageInput[Message Input]
+    GroupChatRoom --> MessageList
+    GroupChatRoom --> MessageInput
+    
+    %% Data Services
+    MessageInput -->|Send| ChatService[Chat Service]
+    ChatService -->|Update| MessageList
+    ChatService -->|Update Status| ChatList
+    
+    %% Real-time Updates
+    ChatService -->|Online Status| OnlineUsers
+    ChatService -->|New Message| Notification((Notification))
+    
+    %% State Management
+    subgraph Hooks
+        useAuth[useAuth]
+        useChat[useChat]
+        useMessages[useMessages]
+        useAvailableUsers[useAvailableUsers]
+        useChatActions[useChatActions]
+    end
+
+    %% Hook Connections
+    AuthService --- useAuth
+    ChatService --- useChat
+    ChatService --- useMessages
+    ChatService --- useAvailableUsers
+    ChatService --- useChatActions
