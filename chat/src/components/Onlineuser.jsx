@@ -35,9 +35,7 @@ export const OnlineUsers = () => {
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // const handlePageChange = (pageNumber) => {
-  //   setCurrentPage(pageNumber);
-  // };
+  
 
   if (loading) {
     return (
